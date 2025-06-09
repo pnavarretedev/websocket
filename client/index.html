@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Client</title>
+    <script src="https://cdn.jsdelivr.net/npm/@babel/polyfill/dist/polyfill.min.js"></script>
+    <script type="module">
+        import {io} from 'https://cdn.socket.io/4.8.1/socket.io.esm.min.js';
+        const socket = new io({
+                auth:{
+                    token: 'your_token_here', // Replace with your actual token
+                    username: 'your_username_here', // Replace with your actual username
+                    serverOffset: 0 // Replace with your actual server offset if needed
+                }
+
+        });
+
+        const chatForm = document.getElementById('chat-form');
+        const chatInput = document.getElementById('chat-input');
+        const chatMessages = document.getElementById('messages');
+
+        chatForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const message = chatInput.value.trim();
+            if (message) {
+                socket.emit('chat message', message);
+                chatInput.value = '';
+            }
+        });
+
+        socket.on('chat message', (msg, serverOffset) => {
+            const messageElement = `<li>${msg}</li>`;
+            chatMessages.insertAdjacentHTML('beforeend', messageElement);
+            socket.auth.serverOffset = serverOffset; // Update server offset if needed
+        });
+
+    </script>
+
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: grid;
+            color: #333;
+            place-content: center;
+            height: 100vh;
+            padding: 36px 36px 100px 36px;
+            grid-template-rows: 1fr;
+        }
+        h1 {
+            color: #790b35;
+        }
+        #chat {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            width: 350PX;
+            height: 90vh;
+            position: relative;
+            background-color: #fff;
+        }
+
+        #chat-form {
+             bottom: 0;
+             display: flex;
+             height: 48px;
+             left: 0;
+             padding: 4px;
+            position: absolute;
+            right: 0;
+        }
+
+        #chat-input {
+            border-radius: 9999px;
+            border: 1px solid #ddd;
+            flex: 1;
+            padding: 0 8px;
+        }
+
+        #chat-input:focus {
+            outline: none;
+        }
+
+        #chat-form > button {
+            background-color: hsl(209, 74%, 53%);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 4px;
+            padding: 0 16px;
+        }
+
+        #chat-form > button:hover {
+            background-color: #0d3a5f;
+        }
+
+        #messages {
+            list-style: none;
+            margin: 0;
+            padding: 0px;
+            overflow-y: auto;
+            height: calc(100% - 48px);
+        }
+
+        #messages li {
+            padding: .5rem 1rem;
+            border-bottom: 1px solid #dddddd33;
+        }
+
+        #messages li:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <h1>WebSocket Client</h1>
+    <section id="chat">
+        <ul id="messages"></ul>
+        <form id="chat-form">
+            <input type="text" id="chat-input" placeholder="Escribe tu mensaje aqui..." required>
+            <button type="submit">Enviar</button>
+        </form>
+    </section>
+</body>
+</html>
